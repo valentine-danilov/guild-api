@@ -1,7 +1,7 @@
 import { mapToHtmlType } from './Utils'
 
 export async function fetchCatalogList() {
-    const response = await fetch("http://10.160.44.215:8080/profile", {
+    const response = await fetch("http://localhost:8080/profile", {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ export async function fetchCatalogList() {
 
 export async function fetchCatalogMetadata(catalogName) {
 
-    const endpoint = "http://10.160.44.215:8080/profile/" + catalogName;
+    const endpoint = "http://localhost:8080/profile/" + catalogName;
     const response = await fetch(endpoint, {
         method: 'GET',
         headers: {

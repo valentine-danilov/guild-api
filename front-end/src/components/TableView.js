@@ -33,6 +33,7 @@ export default class TableView extends React.Component {
     addEmptyRow = () => {
 
         let records = this.state.records;
+        console.log(this.state)
 
         const columns = this.state.columnNames.map(heading => {
 
@@ -63,7 +64,7 @@ export default class TableView extends React.Component {
 
     loadMetadata = async catalogName => {
 
-        const endpoint = "http://10.160.44.215:8080/profile/" + catalogName;
+        const endpoint = "http://localhost:8080/profile/" + catalogName;
         const response = await fetch(endpoint, {
             method: 'GET',
             headers: {
@@ -99,7 +100,7 @@ export default class TableView extends React.Component {
             return;
         }
 
-        const catalogEndpoint = "http://10.160.44.215:8080/" + catalogName + "?projection=withId";
+        const catalogEndpoint = "http://localhost:8080/" + catalogName + "?projection=withId";
 
         const catalogResponse = await fetch(catalogEndpoint, {
             method: 'GET',
@@ -139,7 +140,7 @@ export default class TableView extends React.Component {
         const body = tableToRequestBody(this.state.records);
         const json = JSON.stringify(body);
         console.log(json)
-        const submitEndpoint = "http://10.160.44.215:8080/catalog/" + this.props.catalogName + "/submit";
+        const submitEndpoint = "http://localhost:8080/catalog/" + this.props.catalogName + "/submit";
 
         const submitResponse = await fetch(submitEndpoint, {
             method: 'POST',

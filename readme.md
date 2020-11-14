@@ -1,4 +1,5 @@
 #About
+
 This application is a personal project. Created mostly for new experience. It provides an API to access World of Warcraft retail data via Blizzard API.
 <p>Current implementation is fully written in JetBrains Kotlin lang</p>
 The following technologies is used:
@@ -11,6 +12,7 @@ The following technologies is used:
 6. Concurrency - Kotlin Coroutines
 
 #How to startup
+
 To startup this application you will need Redis, local or external.
 To access Blizzard API you will need Battle.net developer account credentials (Client ID and Client Secret)
 

@@ -2,6 +2,7 @@ package by.danilov.wow.guild.service.blizzard
 
 import by.danilov.wow.guild.domain.auth.Token
 import by.danilov.wow.guild.serialization.TokenDeserializer
+import by.danilov.wow.guild.serialization.api.ResponseDeserializer
 import by.danilov.wow.guild.service.api.blizzard.BlizzardApiClient
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Parameters
@@ -10,7 +11,7 @@ import com.github.kittinunf.fuel.core.extensions.authentication
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
-import java.lang.IllegalArgumentException
+import kotlin.IllegalArgumentException
 
 @Service
 open class BlizzardApiFuelClient(private var tokenDeserializer: TokenDeserializer) : BlizzardApiClient {
@@ -23,6 +24,9 @@ open class BlizzardApiFuelClient(private var tokenDeserializer: TokenDeserialize
     @Value("\${blizzard.api.client-secret}")
     private lateinit var clientSecret: String
 
+    @Value("\${blizzard.api.auth.path}")
+    private lateinit var authPath: String
+
     private fun getOauthToken(clientId: String, clientSecret: String): String {
 
         if (clientId.isEmpty() || clientSecret.isEmpty()) {
@@ -30,7 +34,7 @@ open class BlizzardApiFuelClient(private var tokenDeserializer: TokenDeserialize
         }
 
         if (token == null || token!!.isExpired()) {
-            token = Fuel.post("https://us.battle.net/oauth/token", listOf("grant_type" to "client_credentials"))
+            token = Fuel.post(authPath, listOf("grant_type" to "client_credentials"))
                 .authentication()
                 .basic(clientId, clientSecret)
                 .responseObject(tokenDeserializer).third.get()
@@ -38,15 +42,20 @@ open class BlizzardApiFuelClient(private var tokenDeserializer: TokenDeserialize
         return token!!.accessToken
     }
 
+    @Suppress("UNCHECKED_CAST")
     @Cacheable("cache_blizzardApi", keyGenerator = "apiRequestKeyGenerator")
     override fun <T : Any> authorizedGetRequest(
         url: String,
-        deserializer: ResponseDeserializable<T>,
+        deserializer: ResponseDeserializer<T>,
         queryParams: Parameters,
-    ) : T {
+    ): T {
+        if (deserializer !is ResponseDeserializable<*>) {
+            throw IllegalArgumentException("Deserializer should be of type com.github.kittinunf.fuel.core.ResponseDeserializable<T> when using Fuel implementation")
+        }
+
         return Fuel.get(url, queryParams)
             .authentication()
             .bearer(getOauthToken(clientId, clientSecret))
-            .responseObject(deserializer).third.get()
+            .responseObject(deserializer as ResponseDeserializable<T>).third.get()
     }
 }

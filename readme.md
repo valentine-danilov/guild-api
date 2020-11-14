@@ -27,7 +27,7 @@ General steps to run fully efficient application:
     ```
 2. You should have Redis installed on your local machine or externally (TBD create Docker compose file to run application and Redis in one container)
 
-    You can run Redis in Docker. Here is steps how to run Redis instance in Docker locally:
+    You can run Redis in Docker. Here are steps how to run Redis instance in Docker locally:
     * Install Docker
     * Pull Redis image
         
@@ -40,6 +40,11 @@ General steps to run fully efficient application:
     ```
     docker run --name my-redis-cache -d redis -p 127.0.0.1:6379:6379
     ```
+   
+    __*When your Redis is up and running, set `cache.redis.host` property in `src/main/resource/cache.properties`, e.g.:*__
+   ```properties
+   cache.redis.host=redis://127.0.0.1:6379
+   ```
    
 3. Run `by.danilov.wow.guild.Application.ct#main()` function or create an executable .jar file
     

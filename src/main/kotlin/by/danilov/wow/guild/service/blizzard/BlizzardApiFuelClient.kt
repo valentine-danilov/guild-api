@@ -10,10 +10,11 @@ import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.extensions.authentication
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.context.annotation.PropertySource
 import org.springframework.stereotype.Service
-import kotlin.IllegalArgumentException
 
 @Service
+@PropertySource("classpath:authentication.properties")
 open class BlizzardApiFuelClient(private var tokenDeserializer: TokenDeserializer) : BlizzardApiClient {
 
     private var token: Token? = null

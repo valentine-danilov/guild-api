@@ -12,7 +12,7 @@ class CharacterProfileController(var blizzardApiService: BlizzardApiService) {
 
         val requestEntity = RequestEntityProvider.contextToRequestEntity(context).apply {
             this.realmSlug = context.pathParam("realmSlug")
-            this.nameSlug = context.pathParam("characterName")
+            this.characterName = context.pathParam("characterName")
         }
 
         val characterProfileSummary = blizzardApiService.getCharacterProfileSummary(requestEntity)

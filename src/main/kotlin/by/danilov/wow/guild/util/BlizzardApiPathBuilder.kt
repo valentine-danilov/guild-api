@@ -6,7 +6,7 @@ class BlizzardApiPathBuilder(private var apiHost: String) {
 
     companion object {
         fun builder(apiHost: String): BlizzardApiPathBuilder {
-            return BlizzardApiPathBuilder.builder(apiHost)
+            return BlizzardApiPathBuilder(apiHost)
         }
     }
 

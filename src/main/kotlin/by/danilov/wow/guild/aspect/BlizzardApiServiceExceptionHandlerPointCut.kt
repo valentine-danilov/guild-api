@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 @Component
 open class BlizzardApiServiceExceptionHandlerPointCut {
 
-    @AfterThrowing(pointcut = "execution(* by.danilov.wow.guild.service.blizzard.BlizzardApiService.*(..))", throwing = "exception")
+    @AfterThrowing(pointcut = "execution(* by.danilov.wow.guild.service.blizzard.BlizzardApiServiceImpl.*(..))", throwing = "exception")
     fun wrapException(exception: FuelError) {
         throw HttpResponseException(exception.response.statusCode, exception.response.responseMessage)
     }

@@ -7,7 +7,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build Guild API Docker Image
         run: |
-          echo $CR_PAT | docker login ghcr.io -u valikdanilov --password-stdin
+          echo $CR_PAT | docker login ghcr.io -u valikdanilov ValikDanilov1999
           docker compose -p ghcr.io/valikdanilov/guild-api:latest build
           docker run ghcr.io/valikdanilov/guild-api:latest
           docker push ghcr.io/valikdanilov/guild-api:latest

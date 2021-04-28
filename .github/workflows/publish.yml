@@ -1,0 +1,15 @@
+name: publish
+on: [push]
+jobs:
+  publish-guild-api-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/ckeckout@v2
+      - name: Build Guild API Docker Image
+        run: |
+          echo $CR_PAT | docker login ghcr.io -u valikdanilov --password-stdin
+          docker compose -p ghcr.io/valikdanilov/guild-api:latest build
+          docker run ghcr.io/valikdanilov/guild-api:latest
+          docker push ghcr.io/valikdanilov/guild-api:latest
+        env:
+          CR_PATH: ${{secrets.GUILD_API}}

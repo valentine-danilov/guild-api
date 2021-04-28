@@ -4,6 +4,7 @@ import by.danilov.wow.guild.controller.CharacterProfileController
 import by.danilov.wow.guild.controller.GuildApiController
 import by.danilov.wow.guild.domain.exception.ExceptionEntityResponse
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.kittinunf.fuel.core.FuelError
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder
 import io.javalin.http.HttpResponseException

@@ -5,6 +5,7 @@ import by.danilov.wow.guild.serialization.TokenDeserializer
 import by.danilov.wow.guild.serialization.api.ResponseDeserializer
 import by.danilov.wow.guild.service.api.blizzard.BlizzardApiClient
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Parameters
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.extensions.authentication
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.context.annotation.PropertySource
 import org.springframework.stereotype.Service
+import kotlin.jvm.Throws
 
 @Service
 @PropertySource("classpath:authentication.properties")
@@ -43,6 +45,7 @@ open class BlizzardApiFuelClient(private var tokenDeserializer: TokenDeserialize
         return token!!.accessToken
     }
 
+    @Throws(FuelError::class)
     @Suppress("UNCHECKED_CAST")
     @Cacheable("cache_blizzardApi", keyGenerator = "apiRequestKeyGenerator")
     override fun <T : Any> authorizedGetRequest(

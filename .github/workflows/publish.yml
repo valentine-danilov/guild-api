@@ -19,7 +19,7 @@ jobs:
           java-version: '11'
 
       - name: Gradle bootJar
-      - run: ./gradlew bootJar
+        run: ./gradlew bootJar
 
       - name: Build image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"

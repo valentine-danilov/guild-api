@@ -1,0 +1,16 @@
+blizzard:
+  api:
+    host: https://eu.api.blizzard.com
+    processConfig:
+      character:
+        - media
+      guildRoster:
+        - media
+    auth:
+      host: https://us.battle.net
+      clientId: ${CLIENT_ID}
+      clientSecret: ${CLIENT_SECRET}
+
+cache:
+  redis:
+    host: redis://localhost:6379

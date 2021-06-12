@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+    id 'org.jetbrains.kotlin.jvm' version '1.5.0'
     id 'org.springframework.boot' version '2.4.4'
 }
 
@@ -10,22 +10,64 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    kotlinxCoroutinesVersion = "1.5.0"
+    springBootVersion = "2.5.0"
+    javalinVersion = "3.13.7"
+    jacksonVersion = "2.12.3"
+    fuelVersion = "2.3.1"
+    micrometerVersion = "1.7.0"
+    feignMicrometerVersion = "11.2"
+    redissonVersion = "3.15.5"
+    caffeineVersion = "3.0.2"
+    commonsLang3Version = "3.12.0"
+    springCloudVersion = "3.0.3"
+    jUnitVersion = "5.7.2"
+}
+
+test {
+    useJUnitPlatform()
+}
+
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1'
+    /*Kotlin*/
+    implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'
+    implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: "${kotlinxCoroutinesVersion}"
 
-    compile 'io.javalin:javalin:3.11.2'
+    /*Web*/
+    implementation group: 'io.javalin', name: 'javalin', version: "${javalinVersion}"
+    implementation group: 'io.javalin', name: 'javalin-openapi', version: "${javalinVersion}"
+    implementation group: 'com.github.kittinunf.fuel', name: 'fuel', version: "${fuelVersion}"
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: "${springCloudVersion}"
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-loadbalancer', version: "${springCloudVersion}"
 
-    compile 'com.github.kittinunf.fuel:fuel:2.3.0'
+    /*Jackson*/
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${jacksonVersion}"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "${jacksonVersion}"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: "${jacksonVersion}"
 
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.11.3'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.11.3'
+    /*Spring Boot*/
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: "${springBootVersion}"
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: "${springBootVersion}"
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: "${springBootVersion}"
 
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter', version: '2.3.5.RELEASE'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: '2.3.5.RELEASE'
+    /*Monitoring*/
+    implementation group: 'io.micrometer', name: 'micrometer-core', version: "${micrometerVersion}"
+    implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: "${micrometerVersion}"
+    implementation group: 'io.github.openfeign', name: 'feign-micrometer', version: "${feignMicrometerVersion}"
 
-    compile group: 'org.redisson', name: 'redisson', version: '3.13.6'
+
+    /*Caching*/
+    implementation group: 'org.redisson', name: 'redisson', version: "${redissonVersion}"
+    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: "${caffeineVersion}"
+
+    /*Utility*/
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: "${commonsLang3Version}"
+    implementation 'org.junit.jupiter:junit-jupiter:5.7.0'
+
+    /*Test*/
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: "${jUnitVersion}"
+
 }
 
 compileKotlin {

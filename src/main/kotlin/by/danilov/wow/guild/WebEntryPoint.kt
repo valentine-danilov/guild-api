@@ -4,11 +4,13 @@ import by.danilov.wow.guild.controller.CharacterProfileController
 import by.danilov.wow.guild.controller.GuildApiController
 import by.danilov.wow.guild.domain.exception.ExceptionEntityResponse
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.kittinunf.fuel.core.FuelError
 import io.javalin.Javalin
-import io.javalin.apibuilder.ApiBuilder
+import io.javalin.apibuilder.ApiBuilder.get
+import io.javalin.core.plugin.Plugin
 import io.javalin.http.HttpResponseException
 import io.javalin.plugin.json.JavalinJackson
+import io.micrometer.prometheus.PrometheusMeterRegistry
+import io.prometheus.client.exporter.common.TextFormat
 import org.springframework.stereotype.Component
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
@@ -16,12 +18,15 @@ import java.nio.charset.StandardCharsets
 @Component
 class WebEntryPoint(
     private val guildApiController: GuildApiController,
-    private val characterProfileController: CharacterProfileController
+    private val characterProfileController: CharacterProfileController,
+    private val plugins: List<Plugin>,
+    private val prometheusRegistry: PrometheusMeterRegistry
 ) {
 
     fun init(): Javalin {
         JavalinJackson.configure(ObjectMapper())
         val application = Javalin.create { config ->
+            plugins.forEach { config.registerPlugin(it) }
             config.requestLogger { context, ms ->
                 Javalin.log.info(
                     "${context.method()} ${
@@ -35,11 +40,15 @@ class WebEntryPoint(
         }
 
         application.routes {
-            ApiBuilder.get("/api/guild/:realmSlug/:nameSlug/roster") { context ->
+            get("/api/guild/:realmSlug/:nameSlug/roster") { context ->
                 guildApiController.getGuildRoster(context)
             }
-            ApiBuilder.get("/api/profile/character/:realmSlug/:characterName") { context ->
+            get("/api/profile/character/:realmSlug/:characterName") { context ->
                 characterProfileController.getCharacterProfileSummary(context)
+            }
+            get("/prometheus") { context ->
+                context.contentType(TextFormat.CONTENT_TYPE_004)
+                    .result(prometheusRegistry.scrape())
             }
         }
 

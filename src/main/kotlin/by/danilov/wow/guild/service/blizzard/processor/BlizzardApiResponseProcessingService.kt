@@ -1,52 +1,56 @@
 package by.danilov.wow.guild.service.blizzard.processor
 
-import by.danilov.wow.guild.serialization.MutableMapDeserializer
-import by.danilov.wow.guild.service.api.blizzard.BlizzardApiClient
+import by.danilov.wow.guild.client.BlizzardApiFuelClient
+import by.danilov.wow.guild.properties.BlizzardApiConfigProperties
 import by.danilov.wow.guild.service.api.blizzard.processor.BlizzardApiProcessorService
-import by.danilov.wow.guild.util.RequestEntityProvider.Companion.LOCALE
 import kotlinx.coroutines.*
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
 class BlizzardApiResponseProcessingService(
-    private var blizzardApiClient: BlizzardApiClient,
-    private var deserializer: MutableMapDeserializer
+    private var blizzardApiFuelClient: BlizzardApiFuelClient,
+    private val processingConfiguration: ProcessingConfiguration
 ) : BlizzardApiProcessorService {
 
-    @Value("#{'\${blizzard.api.process.config}'.split(',')}")
-    private lateinit var processConfiguration: List<String>
-
-    override fun process(content: MutableMap<String, Any>, locale: String) {
+    override fun process(content: MutableMap<String, Any>, locale: String, processingType: ProcessingType) {
         runBlocking {
             withContext(Dispatchers.IO) {
-                process(content, locale, this)
+                process(content, locale, processingType, this)
             }
         }
     }
 
     @Suppress("UNCHECKED_CAST")
-    private suspend fun process(content: MutableMap<String, Any>, locale: String, coroutineScope: CoroutineScope) {
+    private suspend fun process(
+        content: MutableMap<String, Any>,
+        locale: String,
+        processingType: ProcessingType,
+        coroutineScope: CoroutineScope,
+    ) {
         content.entries.forEach {
             when {
-                it.value is List<*> -> {
-                    processIfList(it.value as List<*>, locale, coroutineScope)
+                processingConfiguration.getConfigurationByType(processingType).contains(it.key) -> {
+                    processIfConfigured(it, content, locale, processingType, coroutineScope)
                 }
-                processConfiguration.contains(it.key) -> {
-                    processIfConfigured(it, content, locale, coroutineScope)
+                it.value is List<*> -> {
+                    processIfList(it.value as List<*>, locale, processingType, coroutineScope)
                 }
                 it.value is MutableMap<*, *> -> {
-                    process(it.value as MutableMap<String, Any>, locale, coroutineScope)
+                    process(it.value as MutableMap<String, Any>, locale, processingType, coroutineScope)
                 }
             }
         }
     }
 
     @Suppress("UNCHECKED_CAST")
-    private suspend fun processIfList(content: List<*>, locale: String, coroutineScope: CoroutineScope) {
+    private suspend fun processIfList(
+        content: List<*>, locale: String,
+        processingType: ProcessingType,
+        coroutineScope: CoroutineScope,
+    ) {
         content.forEach { listElem ->
             if (listElem is MutableMap<*, *>) {
-                process(listElem as MutableMap<String, Any>, locale, coroutineScope)
+                process(listElem as MutableMap<String, Any>, locale, processingType, coroutineScope)
             }
         }
     }
@@ -56,17 +60,15 @@ class BlizzardApiResponseProcessingService(
         entry: MutableMap.MutableEntry<String, Any>,
         content: MutableMap<String, Any>,
         locale: String,
-        coroutineScope: CoroutineScope
+        processingType: ProcessingType,
+        coroutineScope: CoroutineScope,
     ) {
         if (entry.value is MutableMap<*, *>) {
             getSubComponentHref(entry.value as MutableMap<String, Any>)?.let {
                 coroutineScope.launch {
                     val response =
-                        blizzardApiClient.authorizedGetRequest(
-                            it, deserializer,
-                            listOf(LOCALE to locale)
-                        )
-                    process(response, locale, coroutineScope)
+                        blizzardApiFuelClient.get(it, listOf("locale" to locale))
+                    process(response, locale, processingType, coroutineScope)
                     content[entry.key] = response
                 }
             }
